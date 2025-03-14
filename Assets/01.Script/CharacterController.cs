@@ -8,7 +8,8 @@ public class CharacterController : MonoBehaviour
     private float rotationSpeed = 700f;
     private Rigidbody rd;
     public GameObject shieldEffect;
-    private bool isShieldActive = false;
+    public bool isShieldActive = false;
+    public bool isGameOver = false;
 
     Animator animator;
 
@@ -19,18 +20,28 @@ public class CharacterController : MonoBehaviour
         if (shieldEffect != null)
         {
             shieldEffect.SetActive(false); // 처음에는 보호막 비활성화
+            isShieldActive = false;
         }
     }
     void Update()
     {
-        MovePlayer();
+        if (isGameOver) return; 
+        
+        MovePlayer(); 
+        
     }
     public void ShieldAtive()
     {
+        
         if (shieldEffect != null)
         {
             shieldEffect.SetActive(true); // 쉴드 이펙트 활성화
+            isShieldActive = true;
             StartCoroutine(DisableShieldAfterDelay(10f)); // 10초 뒤에 쉴드 비활성화
+        }
+        else
+        {
+            Debug.LogWarning("ShieldEffect is not assigned.");
         }
     }
 
@@ -44,23 +55,27 @@ public class CharacterController : MonoBehaviour
 
         for (float t = 0; t < blinkDuration; t += blinkInterval)
         {
+            if (!isShieldActive) break; // 쉴드가 비활성화되면 루프 탈출
+
             shieldEffect.SetActive(!shieldEffect.activeSelf); // 깜빡임 효과 
             yield return new WaitForSeconds(blinkInterval); // 0.5초 간격으로 깜빡임
         }
 
         // 최종적으로 쉴드 비활성화
         shieldEffect.SetActive(false);
-    
+        isShieldActive = false;
+
     }
 
-    void MovePlayer()
+    void MovePlayer() //이동 구현
     {
-        float moveX = Input.GetAxis("Horizontal");
-        float moveZ = Input.GetAxis("Vertical");
+        float moveX = Input.GetAxisRaw("Horizontal");
+        float moveZ = Input.GetAxisRaw("Vertical");
 
 
         Vector3 move = new Vector3(moveX, 0, moveZ).normalized;
-        if (move.magnitude >= 0.1f)
+                
+        if (move != Vector3.zero)
         {
             rd.MovePosition(transform.position + move * walkSpeed * Time.deltaTime);
 
@@ -76,6 +91,7 @@ public class CharacterController : MonoBehaviour
             rd.linearVelocity = Vector3.zero;
             animator.SetFloat("speed", 0f);
         }
+        
 
 
         //Vector3 move = new Vector3(moveX, 0, moveZ).normalized;
@@ -98,6 +114,17 @@ public class CharacterController : MonoBehaviour
         //    rd.linearVelocity = new Vector3(0, rd.linearVelocity.y, 0);
         //    animator.SetFloat("speed", 0f);
         //}
+    }
+    public void gameOver()
+    {
+        if(!isGameOver)
+        {
+            isGameOver = true;
+            animator.SetTrigger("Die");
+
+            GameManager gameManager = FindAnyObjectByType<GameManager>();
+            gameManager.GameOver();
+        }
     }
 
 }
