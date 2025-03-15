@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 public class CharacterController : MonoBehaviour
 {
-    public float walkSpeed = 15f;
+    public float walkSpeed = 10f;
     private float rotationSpeed = 700f;
     private Rigidbody rd;
     public GameObject shieldEffect;
