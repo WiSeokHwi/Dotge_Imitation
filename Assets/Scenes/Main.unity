@@ -1445,7 +1445,8 @@ MonoBehaviour:
   gameOverUI: {fileID: 511087678}
   safeTimeText: {fileID: 1528724250}
   bestTime: {fileID: 1900296499}
-  phaseNum: {fileID: 0}
+  phaseNum: {fileID: 1809781592}
+  phaseLv: 0
 --- !u!4 &1294668143
 Transform:
   m_ObjectHideFlags: 0

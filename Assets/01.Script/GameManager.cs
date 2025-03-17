@@ -11,8 +11,16 @@ public class GameManager : MonoBehaviour
     public Text bestTime; // 게임 점수
     public Text phaseNum; // 게임 페이즈
     private float surviveTime; // 생존 시간
+    public float phaseLv;
+    public static GameManager instance;
 
-
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+    }
     void Start()
     {
         surviveTime = 0;
@@ -20,6 +28,8 @@ public class GameManager : MonoBehaviour
         character = FindAnyObjectByType<CharacterController>();
 
     }
+
+
 
     // Update is called once per frame
     void Update()
@@ -33,16 +43,19 @@ public class GameManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.R))
             {
-                SceneManager.LoadScene("SampleScene");
+                SceneManager.LoadScene("Main");
             }
 
         }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene("Start");
+        }
+        phaseLv = (surviveTime < 15f) ? 1 : 2;
+
+        phaseNum.text = "Phase: " + phaseLv.ToString("0");
     }
-    public void phaseLevel()
-    {
-        int phase = PlayerPrefs.GetInt("phase");
-        phaseNum.text = "Phase: " + phase.ToString();
-    }
+
     public void GameOver()
     {
         

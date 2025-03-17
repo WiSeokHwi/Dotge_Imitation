@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 public class CharacterController : MonoBehaviour
 {
-    public float walkSpeed = 10f;
+    public float walkSpeed = 15f;
     private float rotationSpeed = 700f;
     private Rigidbody rd;
     public GameObject shieldEffect;
@@ -72,8 +72,16 @@ public class CharacterController : MonoBehaviour
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveZ = Input.GetAxisRaw("Vertical");
 
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            walkSpeed = 25f;
+        }
+        else
+        {
+            walkSpeed = 15f;
+        }
 
-        Vector3 move = new Vector3(moveX, 0, moveZ).normalized;
+            Vector3 move = new Vector3(moveX, 0, moveZ).normalized;
                 
         if (move != Vector3.zero)
         {

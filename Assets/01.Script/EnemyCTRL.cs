@@ -12,6 +12,8 @@ public class EnemyCTRL : MonoBehaviour
     private Transform target;
     private CharacterController character;
     public float minDistanceForPrediction = 4f; // 예측을 하지 않을 최소 거리
+    private float minShotSpeed;
+    private float maxShotSpeed;
 
 
     void Start()
@@ -48,6 +50,7 @@ public class EnemyCTRL : MonoBehaviour
                 // 가까이 있으면 예측하지 않고 바로 플레이어 위치로 향하게 설정
                 SmoothLookAt(target.position);
             }
+            
         }
     }
 
@@ -63,20 +66,38 @@ public class EnemyCTRL : MonoBehaviour
         {
             if (target != null && !character.isGameOver)
             {
-                // 플레이어와 가까운 경우 예측을 하지 않음
-                if (Vector3.Distance(transform.position, target.position) > minDistanceForPrediction)
+                if (GameManager.instance.phaseLv == 2)
                 {
+                    minShotSpeed = 0.5f;
+                    maxShotSpeed = 1f;
+
                     Vector3 predictedPosition = PredictTargetPosition();
+
+                    Shoot(target.position); // 가까운 거리에서는 바로 발사
+                    yield return new WaitForSeconds(Random.Range(0.5f,1.0f));
                     Shoot(predictedPosition);
                 }
                 else
                 {
-                    Shoot(target.position); // 가까운 거리에서는 바로 발사
+                    minShotSpeed = 1f;
+                    maxShotSpeed = 1.5f;
+                    
+                    // 플레이어와 가까운 경우 예측을 하지 않음
+                    if (Vector3.Distance(transform.position, target.position) > minDistanceForPrediction)
+                    {
+                        Vector3 predictedPosition = PredictTargetPosition();
+                        Shoot(predictedPosition);
+                    }
+                    else
+                    {
+                        Shoot(target.position); // 가까운 거리에서는 바로 발사
+
+                    }
                 }
             }
 
             // 0.5초~2.0초 사이의 랜덤 시간 대기
-            yield return new WaitForSeconds(Random.Range(0.5f, 1.5f));
+            yield return new WaitForSeconds(Random.Range(minShotSpeed, maxShotSpeed));
         }
     }
     Vector3 PredictTargetPosition()
@@ -101,7 +122,7 @@ public class EnemyCTRL : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
     }
     void Shoot(Vector3 targetPosition)
-    {        
+    {
         // 총알 방향 설정
         Vector3 shootDirection = (targetPosition - firePoint.position).normalized;
         shootDirection.y = 0;
